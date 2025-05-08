@@ -11,16 +11,18 @@ public class Player : MonoBehaviour
     [SerializeField, Min(0f)]
     float moveSpeed;
     [SerializeField, Min(0.1f)]
-    float jumpInputTime;
+    float jumpBufferingTime;
 
     float jumpSpeed;
     float gravityAccel;
     float distanceToGround;
     Rigidbody2D rb;
 
+    Vector3 lastPosition;
     float moveInput;
-    float jumpInputCounter;
-    bool jumpInput;
+    float jumpInputTimer;
+    bool jumpPressed;
+
 
 
     private void Awake()
@@ -40,33 +42,39 @@ public class Player : MonoBehaviour
     void Update()
     {
         moveInput = Input.GetAxisRaw("Horizontal");
+        jumpPressed = Input.GetButton("Jump");
+
         if (Input.GetButtonDown("Jump"))
         {
-            jumpInputCounter = jumpInputTime;
+            jumpInputTimer = jumpBufferingTime;
         }
         else
         {
-            jumpInputCounter -= Mathf.Max(0f, jumpInputCounter - Time.deltaTime);
+            jumpInputTimer = Mathf.Max(0f, jumpInputTimer - Time.deltaTime);
         }
-        jumpInput = jumpInputCounter > 0;
     }
 
     void FixedUpdate()
     {
         float movementX = moveInput * moveSpeed;
+        rb.velocity = new Vector2(movementX, rb.velocity.y);
+        
+        if (!jumpPressed && rb.velocity.y > 0f)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y*0.5f);
+        }
 
-        if (IsGrounded() && jumpInput)
+        if (IsGrounded() && jumpInputTimer > 0f)
         {
             Debug.Log("JUMP");
             rb.AddForce(Vector2.up * jumpSpeed, ForceMode2D.Impulse);
-            jumpInputCounter = 0f;
+            jumpInputTimer = 0f;
         }
         else
         {
             rb.AddForce(Vector2.down * gravityAccel);
         }
 
-        rb.velocity = new Vector2(movementX, rb.velocity.y);
     }
 
     bool IsGrounded()

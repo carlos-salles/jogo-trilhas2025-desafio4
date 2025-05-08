@@ -128,7 +128,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 0
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
@@ -149,4 +149,4 @@ MonoBehaviour:
   peakHeight: 4
   peakTime: 0.4
   moveSpeed: 10
-  jumpInputTime: 0.5
+  jumpBufferingTime: 0.2

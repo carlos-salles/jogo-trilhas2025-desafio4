@@ -9,11 +9,12 @@ public class SlingShot : MonoBehaviour
     Vector2 mouseClickPos;
     bool isDragging = false;
     float launchIntensity;
-    Vector2 launchDirection;
+    public Vector2 launchDirection { get; private set; }
     [SerializeField]
     GameObject projectilePrefab;
     Projectile projectile;
     Texture2D circleTexture;
+    public bool shooting { get; private set; }
 
     void Start()
     {
@@ -26,11 +27,13 @@ public class SlingShot : MonoBehaviour
         {
             mouseClickPos = Input.mousePosition;
             isDragging = true;
+            shooting = true;
         }
 
         if (Input.GetMouseButtonUp(0) && isDragging)
         {
             isDragging = false;
+            shooting = false;
 
             GameObject newProjectile = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
             Projectile projectile = newProjectile.GetComponent<Projectile>();

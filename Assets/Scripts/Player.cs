@@ -26,8 +26,6 @@ public class Player : MonoBehaviour
     float jumpSpeed;
     float maxFallSpeed;
     float gravityAccel;
-    float distanceToGround;
-    float colliderWidth;
     Rigidbody2D rb;
 
     Vector3 lastPosition;
@@ -49,9 +47,6 @@ public class Player : MonoBehaviour
         jumpSpeed = 2 * peakHeight / peakTime;
         maxFallSpeed = maxFallSpeedFactor * jumpSpeed;
         gravityAccel = jumpSpeed / peakTime;
-
-        distanceToGround = GetComponent<Collider2D>().bounds.extents.y;
-        colliderWidth = GetComponent<Collider2D>().bounds.size.x;
 
         rb = GetComponent<Rigidbody2D>();
     }
@@ -177,8 +172,8 @@ public class Player : MonoBehaviour
                 rb.AddForce(Vector2.down * gravityAccel);
             }
         }
-        Debug.Log($"current y-speed {rb.velocity.y}; terminal y-speed {maxFallSpeed}");
         HandleVisuals(grounded);
+        Debug.Log($"grounded {grounded}");
 
         void HandleVisuals(bool grounded)
         {
@@ -235,10 +230,17 @@ public class Player : MonoBehaviour
 
     bool IsGrounded()
     {
-        Vector3 origin = transform.position + Vector3.down * (distanceToGround + 0.1f);
-        Vector2 size = new Vector2(colliderWidth, 0.1f);
-        LayerMask mask = LayerMask.GetMask("Default");
-        var castHit = Physics2D.BoxCast(origin, size, 0f, Vector2.zero, Mathf.Infinity, mask);
-        return castHit.collider is not null;
+        var hits = new List<ContactPoint2D>();
+        var mask = LayerMask.GetMask("Default");
+        var contactFilter = new ContactFilter2D();
+        contactFilter.SetLayerMask(mask);
+
+        if (rb.GetContacts(hits) == 0)
+        {
+            Debug.Log("No contacts");
+            return false;
+        }
+
+        return hits.Exists(p => Vector2.Angle(p.normal, Vector2.up) < 10f);
     }
 }

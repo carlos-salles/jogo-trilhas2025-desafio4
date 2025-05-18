@@ -14,6 +14,8 @@ public class Player : MonoBehaviour
     float moveSpeed;
     [SerializeField, Min(0.1f)]
     float jumpBufferingTime;
+    [SerializeField, Min(1f)]
+    float maxFallSpeedFactor;
     [SerializeField]
     Sprite jumpSpriteUp;
     [SerializeField]
@@ -22,6 +24,7 @@ public class Player : MonoBehaviour
     Sprite attackSprite;
 
     float jumpSpeed;
+    float maxFallSpeed;
     float gravityAccel;
     float distanceToGround;
     float colliderWidth;
@@ -44,6 +47,7 @@ public class Player : MonoBehaviour
     private void Awake()
     {
         jumpSpeed = 2 * peakHeight / peakTime;
+        maxFallSpeed = maxFallSpeedFactor * jumpSpeed;
         gravityAccel = jumpSpeed / peakTime;
 
         distanceToGround = GetComponent<Collider2D>().bounds.extents.y;
@@ -164,9 +168,16 @@ public class Player : MonoBehaviour
         }
         else
         {
-            rb.AddForce(Vector2.down * gravityAccel);
+            if (rb.velocity.y <= -maxFallSpeed)
+            {
+                rb.velocity = new Vector2(rb.velocity.x, -maxFallSpeed);
+            }
+            else
+            {
+                rb.AddForce(Vector2.down * gravityAccel);
+            }
         }
-
+        Debug.Log($"current y-speed {rb.velocity.y}; terminal y-speed {maxFallSpeed}");
         HandleVisuals(grounded);
 
         void HandleVisuals(bool grounded)

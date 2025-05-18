@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
@@ -36,6 +37,7 @@ public class Player : MonoBehaviour
     SlingShot slingShot;
     Transform arms;
     Transform shootPoint;
+    Transform coolDownBar;
     Vector3 scale;
 
     private void Awake()
@@ -47,6 +49,7 @@ public class Player : MonoBehaviour
 
         rb = GetComponent<Rigidbody2D>();
     }
+
     void Start()
     {
         scale = transform.localScale;
@@ -54,6 +57,7 @@ public class Player : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         arms = transform.Find("Arms");
         shootPoint = transform.Find("ShootPoint");
+        coolDownBar = transform.Find("CoolDownBar");
     }
 
     void Update()
@@ -81,6 +85,23 @@ public class Player : MonoBehaviour
         {
             scale.x = Mathf.Abs(scale.x) * Mathf.Sign(moveInput);
             transform.localScale = scale;
+        }
+
+        if (slingShot.coolDownRecharge)
+        {
+            coolDownBar.gameObject.SetActive(true);
+            if (scale.x < 0)
+            {
+                coolDownBar.localScale = -Vector3.one;
+            }
+            else
+            {
+                coolDownBar.localScale = Vector3.one;
+            }
+        }
+        else
+        {
+            coolDownBar.gameObject.SetActive(false);
         }
     }
 
@@ -156,23 +177,20 @@ public class Player : MonoBehaviour
 
                 float angle = Mathf.Atan2(slingShot.launchDirection.y, slingShot.launchDirection.x) * Mathf.Rad2Deg;
 
-                // Flip do player
                 if (angle > 90f || angle < -90f)
                 {
-                    scale.x = -Mathf.Abs(scale.x); // virar para esquerda
+                    scale.x = -Mathf.Abs(scale.x);
                 }
                 else
                 {
-                    scale.x = Mathf.Abs(scale.x); // virar para direita
+                    scale.x = Mathf.Abs(scale.x);
                 }
 
                 transform.localScale = scale;
 
-                // Corrigir rotação do braço e do ponto de tiro
-                arms.localScale = Vector3.one; // garante escala padrão
+                arms.localScale = Vector3.one;
                 shootPoint.localScale = Vector3.one;
 
-                // Se o personagem estiver flipado, ajusta a rotação espelhando verticalmente
                 if (scale.x < 0)
                 {
                     arms.localRotation = Quaternion.Euler(0f, 0f, 180f - angle);

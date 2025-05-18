@@ -481,7 +481,7 @@ MonoBehaviour:
   peakHeight: 4
   peakTime: 0.4
   moveSpeed: 10
-  jumpBufferingTime: 0.2
+  jumpBufferingTime: 0.4
   jumpSpriteUp: {fileID: 21300000, guid: 4a6794e8187c44a4589b0fd3a045c686, type: 3}
   jumpSpriteDown: {fileID: 21300000, guid: e3e51534ee7b7664db4d5aad1bdaa8d5, type: 3}
   attackSprite: {fileID: 21300000, guid: 4014e7bb6addcf145a87bbf5c713c1b5, type: 3}
@@ -499,7 +499,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.06536478, y: -0.055559933}
+  m_Offset: {x: -0.063421026, y: -0.055559933}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -510,7 +510,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.92176926, y: 1.6488801}
+  m_Size: {x: 0.8245821, y: 1.6488801}
   m_EdgeRadius: 0
 --- !u!95 &568280106
 Animator:

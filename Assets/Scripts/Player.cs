@@ -24,6 +24,7 @@ public class Player : MonoBehaviour
     float jumpSpeed;
     float gravityAccel;
     float distanceToGround;
+    float colliderWidth;
     Rigidbody2D rb;
 
     Vector3 lastPosition;
@@ -46,6 +47,7 @@ public class Player : MonoBehaviour
         gravityAccel = jumpSpeed / peakTime;
 
         distanceToGround = GetComponent<Collider2D>().bounds.extents.y;
+        colliderWidth = GetComponent<Collider2D>().bounds.size.x;
 
         rb = GetComponent<Rigidbody2D>();
     }
@@ -122,7 +124,7 @@ public class Player : MonoBehaviour
         float movementX = moveInput * moveSpeed;
         rb.velocity = new Vector2(movementX, rb.velocity.y);
 
-        if (IsGrounded())
+        if (grounded)
         {
             animator.enabled = true;
 
@@ -154,7 +156,7 @@ public class Player : MonoBehaviour
             rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
         }
 
-        if (IsGrounded() && jumpInputTimer > 0f)
+        if (grounded && jumpInputTimer > 0f)
         {
             Debug.Log("JUMP");
             rb.AddForce(Vector2.up * jumpSpeed, ForceMode2D.Impulse);
@@ -222,12 +224,10 @@ public class Player : MonoBehaviour
 
     bool IsGrounded()
     {
-        Vector2 origin = transform.position;
-        float distance = distanceToGround + 0.1f;
+        Vector3 origin = transform.position + Vector3.down * (distanceToGround + 0.1f);
+        Vector2 size = new Vector2(colliderWidth, 0.1f);
         LayerMask mask = LayerMask.GetMask("Default");
-        RaycastHit2D raycastHit = Physics2D.Raycast(origin, Vector2.down, distance, mask);
-        bool grounded = raycastHit.collider is not null;
-        Debug.Log(grounded);
-        return grounded;
+        var castHit = Physics2D.BoxCast(origin, size, 0f, Vector2.zero, Mathf.Infinity, mask);
+        return castHit.collider is not null;
     }
 }

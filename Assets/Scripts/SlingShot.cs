@@ -23,8 +23,6 @@ public class SlingShot : MonoBehaviour
     int numberOfPoints = 10;
     List<GameObject> trajectoryPoints = new List<GameObject>();
     [SerializeField]
-    GameObject coolDownBar;
-    [SerializeField]
     float coolDown;
     float cronometro;
 

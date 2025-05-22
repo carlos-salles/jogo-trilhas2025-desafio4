@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -10,9 +11,22 @@ public class Snake : MonoBehaviour
     float walkSpeed;
     [SerializeField]
     float runSpeed;
-
     [SerializeField]
-    float facingDirection;
+    float contactDamage;
+    [SerializeField]
+    float _facingDirection;
+    float FacingDirection
+    {
+        get => _facingDirection;
+        set
+        {
+            _facingDirection = Math.Sign(value);
+
+            Vector3 scale = transform.localScale;
+            scale.x = _facingDirection;
+            transform.localScale = scale;
+        }
+    }
 
 
     [SerializeField]
@@ -28,7 +42,7 @@ public class Snake : MonoBehaviour
     State currentState;
     Vector3 FacingVector
     {
-        get => Vector3.Normalize(Vector3.right * facingDirection);
+        get => Vector3.Normalize(Vector3.right * FacingDirection);
     }
 
     Rigidbody2D rb;
@@ -65,7 +79,6 @@ public class Snake : MonoBehaviour
         if (viewHit)
         {
             GameObject gameObject = viewHit.collider.attachedRigidbody.gameObject;
-            Debug.Log(gameObject);
             if (gameObject.CompareTag("Player"))
             {
                 playerInstance = gameObject;
@@ -75,12 +88,14 @@ public class Snake : MonoBehaviour
         }
         if (playerInstance != null)
         {
-            playerDistance = Vector3.Distance(transform.position, playerInstance.transform.position);
+            playerDistance = Vector2.Distance(transform.position, playerInstance.transform.position);
         }
-
+        /*
+        Debug.Log($"state: {currentState.ToString()}");
         Debug.Log($"ground: {isHittingGround}");
         Debug.Log($"wall: {isHittingWall}");
         Debug.Log($"player: {isHittingPlayer}");
+        */
 
         if (currentState == State.IDLE)
         {
@@ -90,7 +105,7 @@ public class Snake : MonoBehaviour
             }
             else if (!isHittingGround || (isHittingWall && viewHit.distance < groundRaycastOffsetX))
             {
-                //FlipX();
+                FacingDirection = -FacingDirection;
             }
             else
             {
@@ -103,18 +118,21 @@ public class Snake : MonoBehaviour
             {
                 currentState = State.IDLE;
             }
-            else if (viewHit.distance < viewRaycastDistance / 2)
+            else if (playerDistance < viewRaycastDistance / 2)
             {
                 currentState = State.ATTACK;
             }
             else
             {
+                FacingDirection = playerInstance.transform.position.x - transform.position.x;
                 rb.velocity = FacingVector * runSpeed;
             }
         }
         else if (currentState == State.ATTACK)
         {
-
+            Vector2 jumpDirection = new Vector2(FacingDirection, 1);
+            rb.AddForce(jumpDirection.normalized * 10f, ForceMode2D.Impulse);
+            currentState = State.CHASE;
         }
     }
 
@@ -125,21 +143,11 @@ public class Snake : MonoBehaviour
         Gizmos.DrawRay(GroundRaycastPosition, Vector3.down * groundRaycastDistance);
     }
 
-    void FlipX()
-    {
-        facingDirection = -facingDirection;
-
-        Vector3 scale = transform.localScale;
-        scale.x = facingDirection;
-        transform.localScale = scale;
-    }
     RaycastHit2D ViewRaycast()
     {
         Debug.DrawRay(transform.position, FacingVector * viewRaycastDistance, Color.red);
-        var hit = Physics2D.Raycast(Vector2.zero, FacingVector, viewRaycastDistance);
-        Debug.Log($"View: {hit.transform.name}");
+        var hit = Physics2D.Raycast(transform.position, FacingVector, viewRaycastDistance);
         return hit;
-        
     }
 
     bool IsHittingGround() {

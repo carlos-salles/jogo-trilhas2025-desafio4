@@ -10,13 +10,14 @@ public class Health : MonoBehaviour
     float health;
     [SerializeField, Min(0f)]
     float maxHealth;
-    [SerializeField, Min(0f)]
-    float invincinbilityTimeSeconds;
+    [SerializeField]
+    Timer invencibilityTimer;
     
     public UnityEvent onDeath;
+    public UnityEvent onDamage;
+    public UnityEvent invencibilityFinished;
 
-    float invincinbilityRemainingSeconds;
-    public bool IsInvincible { get => invincinbilityRemainingSeconds > 0; }
+    public bool IsInvincible { get => invencibilityTimer?.IsRunning ?? false; }
     public bool IsAlive { get => health > 0; }
 
     // Start is called before the first frame update
@@ -26,13 +27,14 @@ public class Health : MonoBehaviour
         {
             health = maxHealth;
         }
+        invencibilityTimer?.onFinished?.AddListener(() => invencibilityFinished?.Invoke());
+        invencibilityFinished?.AddListener(() => Debug.Log("FINISHED"));
     }
 
     // Update is called once per frame
     void Update()
     {
         //Debug.Log($"{transform.name} -> {(IsInvincible? "Invincible": "not invincible")}");
-        invincinbilityRemainingSeconds = Mathf.Max(0f, invincinbilityRemainingSeconds - Time.deltaTime);
     }
 
     public void takeDamage(float damage)
@@ -42,11 +44,12 @@ public class Health : MonoBehaviour
         health -= damage;
         if (health > 0)
         {
-            invincinbilityRemainingSeconds = invincinbilityTimeSeconds;
+            invencibilityTimer?.StartTimer();
+            onDamage?.Invoke();
         }
         else
         {
-            onDeath?.Invoke();   
+            onDeath?.Invoke();
         }
     }
 }

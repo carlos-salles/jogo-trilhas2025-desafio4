@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Timer : MonoBehaviour
 {
@@ -13,6 +14,7 @@ public class Timer : MonoBehaviour
     public bool IsStopped { get => !IsRunning; }
     public float TimeLeft { get; private set; }
 
+    public UnityEvent onFinished;
     // Start is called before the first frame update
     void Start()
     {
@@ -29,6 +31,7 @@ public class Timer : MonoBehaviour
         {
             TimeLeft = 0;
             IsRunning = false;
+            onFinished?.Invoke();
         }
     }
 

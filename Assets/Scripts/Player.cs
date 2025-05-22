@@ -157,7 +157,7 @@ public class Player : MonoBehaviour
 
         if (grounded && jumpInputTimer > 0f)
         {
-            Debug.Log("JUMP");
+            //Debug.Log("JUMP");
             rb.AddForce(Vector2.up * jumpSpeed, ForceMode2D.Impulse);
             jumpInputTimer = 0f;
         }
@@ -173,7 +173,7 @@ public class Player : MonoBehaviour
             }
         }
         HandleVisuals(grounded);
-        Debug.Log($"grounded {grounded}");
+        //Debug.Log($"grounded {grounded}");
 
         void HandleVisuals(bool grounded)
         {
@@ -237,7 +237,7 @@ public class Player : MonoBehaviour
 
         if (rb.GetContacts(hits) == 0)
         {
-            Debug.Log("No contacts");
+            //Debug.Log("No contacts");
             return false;
         }
 

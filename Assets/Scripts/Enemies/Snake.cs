@@ -67,6 +67,15 @@ public class Snake : MonoBehaviour
     {
 
     }
+    
+    void OnCollisionStay2D(Collision2D collision)
+    {
+        GameObject gameObject = collision.gameObject;
+        if (gameObject.CompareTag("Player"))
+        {
+            gameObject.GetComponent<Health>().takeDamage(contactDamage);
+        }
+    }
 
     void FixedUpdate()
     {
@@ -131,7 +140,7 @@ public class Snake : MonoBehaviour
         else if (currentState == State.ATTACK)
         {
             Vector2 jumpDirection = new Vector2(FacingDirection, 1);
-            rb.AddForce(jumpDirection.normalized * 10f, ForceMode2D.Impulse);
+            //rb.AddForce(jumpDirection.normalized * 10f, ForceMode2D.Impulse);
             currentState = State.CHASE;
         }
     }

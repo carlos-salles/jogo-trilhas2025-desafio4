@@ -404,8 +404,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1df786a3c77ece94ea881a74b4107f72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  peakHeight: 4
-  peakTime: 0.4
+  peakHeight: 3
+  peakTime: 0.3
   moveSpeed: 10
   jumpBufferingTime: 0.4
   maxFallSpeedFactor: 1.5

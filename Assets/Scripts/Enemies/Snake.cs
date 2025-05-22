@@ -45,7 +45,11 @@ public class Snake : MonoBehaviour
         get => Vector3.Normalize(Vector3.right * FacingDirection);
     }
 
+    float currentVelocity;
+    bool attacked;
+
     Rigidbody2D rb;
+    Timer cooldownTimer;
     GameObject playerInstance;
 
     enum State { IDLE, CHASE, ATTACK }
@@ -53,13 +57,15 @@ public class Snake : MonoBehaviour
     void Awake()
     {
         currentState = State.IDLE;
+        currentVelocity = walkSpeed;
         rb = GetComponent<Rigidbody2D>();
+        cooldownTimer = GetComponentInChildren<Timer>();
         groundRaycastDistance = GetComponent<BoxCollider2D>().bounds.size.y;
     }
     // Start is called before the first frame update
     void Start()
     {
-
+        
     }
 
     // Update is called once per frame
@@ -67,7 +73,7 @@ public class Snake : MonoBehaviour
     {
 
     }
-    
+
     void OnCollisionStay2D(Collision2D collision)
     {
         GameObject gameObject = collision.gameObject;
@@ -79,6 +85,7 @@ public class Snake : MonoBehaviour
 
     void FixedUpdate()
     {
+        Debug.Log($"snake -> {IsGrounded()}");
         RaycastHit2D viewHit = ViewRaycast();
         bool isHittingGround = IsHittingGround();
 
@@ -112,13 +119,14 @@ public class Snake : MonoBehaviour
             {
                 currentState = State.CHASE;
             }
-            else if (!isHittingGround || (isHittingWall && viewHit.distance < groundRaycastOffsetX))
+            else if (IsGrounded() && !isHittingGround || (isHittingWall && viewHit.distance < groundRaycastOffsetX))
             {
                 FacingDirection = -FacingDirection;
             }
             else
             {
-                rb.velocity = FacingVector * walkSpeed;
+                currentVelocity = Mathf.SmoothStep(currentVelocity, FacingDirection * walkSpeed, 0.2f);
+                rb.velocity = new Vector2(currentVelocity, rb.velocity.y);
             }
         }
         else if (currentState == State.CHASE)
@@ -127,21 +135,32 @@ public class Snake : MonoBehaviour
             {
                 currentState = State.IDLE;
             }
-            else if (playerDistance < viewRaycastDistance / 2)
+            else if (playerDistance < viewRaycastDistance * 0.75 && cooldownTimer.IsStopped)
             {
                 currentState = State.ATTACK;
             }
             else
             {
+                float deltaX = playerInstance.transform.position.x - transform.position.x;
+                if (Mathf.Abs(deltaX) > 1f)
                 FacingDirection = playerInstance.transform.position.x - transform.position.x;
-                rb.velocity = FacingVector * runSpeed;
+                currentVelocity = Mathf.SmoothStep(currentVelocity, FacingDirection * runSpeed, 0.25f);
+                rb.velocity = new Vector2(currentVelocity, rb.velocity.y);
             }
         }
         else if (currentState == State.ATTACK)
         {
-            Vector2 jumpDirection = new Vector2(FacingDirection, 1);
-            //rb.AddForce(jumpDirection.normalized * 10f, ForceMode2D.Impulse);
-            currentState = State.CHASE;
+            if (attacked && IsGrounded())
+            {
+                attacked = false;
+                currentState = State.CHASE;
+            }
+            else {
+                Vector2 jumpDirection = new Vector2(FacingDirection * 10, 1);
+                rb.AddForce(jumpDirection, ForceMode2D.Impulse);
+                attacked = true;
+                cooldownTimer.StartTimer();
+            }
         }
     }
 
@@ -159,9 +178,27 @@ public class Snake : MonoBehaviour
         return hit;
     }
 
-    bool IsHittingGround() {
+    bool IsHittingGround()
+    {
         LayerMask mask = LayerMask.GetMask("Default");
         var hit = Physics2D.Raycast(GroundRaycastPosition, Vector2.down, groundRaycastDistance, mask);
         return hit;
+    }
+    
+    bool IsGrounded()
+    {
+        var hits = new List<ContactPoint2D>();
+        var mask = LayerMask.GetMask("Default");
+        var contactFilter = new ContactFilter2D();
+        contactFilter.SetLayerMask(mask);
+
+        if (rb.GetContacts(hits) == 0)
+        {
+            //Debug.Log("No contacts");
+            return false;
+        }
+
+
+        return hits.Exists(p => Vector2.Angle(p.normal, Vector2.up) < 10f);
     }
 }

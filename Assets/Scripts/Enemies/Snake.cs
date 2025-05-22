@@ -65,7 +65,12 @@ public class Snake : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        GameObject scoreObject = GameObject.FindWithTag("Score");
+        if (scoreObject != null) {
+            Score score = scoreObject.GetComponent<Score>();
+            Health thisHealth = GetComponent<Health>();
+            thisHealth.onDeath.AddListener(() => score.AddPoints(10));
+        }
     }
 
     // Update is called once per frame
@@ -119,7 +124,7 @@ public class Snake : MonoBehaviour
             {
                 currentState = State.CHASE;
             }
-            else if (IsGrounded() && !isHittingGround || (isHittingWall && viewHit.distance < groundRaycastOffsetX))
+            else if (IsGrounded() && (!isHittingGround || (isHittingWall && viewHit.distance < groundRaycastOffsetX)))
             {
                 FacingDirection = -FacingDirection;
             }

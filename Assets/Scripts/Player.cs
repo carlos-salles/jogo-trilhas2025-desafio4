@@ -243,4 +243,11 @@ public class Player : MonoBehaviour
 
         return hits.Exists(p => Vector2.Angle(p.normal, Vector2.up) < 10f);
     }
+
+    public void turnInvencible(bool invincible)
+    {
+        string layerName = invincible ? "PlayerInvincible" : "Player";
+        animator.SetBool("invincible", invincible);
+        gameObject.layer = LayerMask.NameToLayer(layerName);
+    }
 }

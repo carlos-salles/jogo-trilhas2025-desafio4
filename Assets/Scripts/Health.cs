@@ -30,7 +30,8 @@ public class Health : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        invincinbilityTimeSeconds = Mathf.Max(0f, invincinbilityTimeSeconds - Time.deltaTime);
+        Debug.Log($"{transform.name} -> {(IsInvincible? "Invincible": "not invincible")}");
+        invincinbilityRemainingSeconds = Mathf.Max(0f, invincinbilityRemainingSeconds - Time.deltaTime);
     }
 
     public void takeDamage(float damage)

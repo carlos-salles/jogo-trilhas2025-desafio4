@@ -17,6 +17,7 @@ public class Health : MonoBehaviour
 
     float invincinbilityRemainingSeconds;
     public bool IsInvincible { get => invincinbilityRemainingSeconds > 0; }
+    public bool IsAlive { get => health > 0; }
 
     // Start is called before the first frame update
     void Start()
@@ -30,13 +31,13 @@ public class Health : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log($"{transform.name} -> {(IsInvincible? "Invincible": "not invincible")}");
+        //Debug.Log($"{transform.name} -> {(IsInvincible? "Invincible": "not invincible")}");
         invincinbilityRemainingSeconds = Mathf.Max(0f, invincinbilityRemainingSeconds - Time.deltaTime);
     }
 
     public void takeDamage(float damage)
     {
-        if (IsInvincible) { return; }
+        if (!IsAlive || IsInvincible) { return; }
 
         health -= damage;
         if (health > 0)

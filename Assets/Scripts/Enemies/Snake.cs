@@ -85,7 +85,7 @@ public class Snake : MonoBehaviour
 
     void FixedUpdate()
     {
-        Debug.Log($"snake -> {IsGrounded()}");
+        //Debug.Log($"snake -> {IsGrounded()}");
         RaycastHit2D viewHit = ViewRaycast();
         bool isHittingGround = IsHittingGround();
 

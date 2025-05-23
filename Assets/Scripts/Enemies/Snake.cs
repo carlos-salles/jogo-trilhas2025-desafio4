@@ -50,6 +50,7 @@ public class Snake : MonoBehaviour
 
     Rigidbody2D rb;
     Timer cooldownTimer;
+    Health health;
     GameObject playerInstance;
 
     enum State { IDLE, CHASE, ATTACK }
@@ -61,15 +62,16 @@ public class Snake : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         cooldownTimer = GetComponentInChildren<Timer>();
         groundRaycastDistance = GetComponent<BoxCollider2D>().bounds.size.y;
+        health = GetComponent<Health>();
     }
     // Start is called before the first frame update
     void Start()
     {
+        health?.onDeath.AddListener(() => Destroy(this.gameObject));
         GameObject scoreObject = GameObject.FindWithTag("Score");
         if (scoreObject != null) {
             Score score = scoreObject.GetComponent<Score>();
-            Health thisHealth = GetComponent<Health>();
-            thisHealth.onDeath.AddListener(() => score.AddPoints(10));
+            health.onDeath.AddListener(() => score.AddPoints(10));
         }
     }
 

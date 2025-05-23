@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 public class Health : MonoBehaviour
 {
@@ -12,7 +13,9 @@ public class Health : MonoBehaviour
     float maxHealth;
     [SerializeField]
     Timer invencibilityTimer;
-    
+    [SerializeField]
+    Image healthBar;
+
     public UnityEvent onDeath;
     public UnityEvent onDamage;
     public UnityEvent invencibilityFinished;
@@ -23,6 +26,11 @@ public class Health : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        if (CompareTag("Player"))
+        {
+            healthBar.fillAmount = health / maxHealth;
+        }
+
         if (health == 0 || health > maxHealth)
         {
             health = maxHealth;
@@ -35,6 +43,10 @@ public class Health : MonoBehaviour
     void Update()
     {
         //Debug.Log($"{transform.name} -> {(IsInvincible? "Invincible": "not invincible")}");
+        if (CompareTag("Player"))
+        {
+            healthBar.fillAmount = health / maxHealth;
+        }
     }
 
     public void takeDamage(float damage)
